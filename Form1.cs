@@ -110,7 +110,8 @@ namespace Dicionario
                     
                     foreach(string line in lines)
                     {
-                        this.AddWord(line);
+                        if(!tabelaHash.exists(line))
+                            this.AddWord(line);
                     }
                 }
                 catch(Exception ex)
