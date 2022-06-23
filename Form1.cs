@@ -83,7 +83,7 @@ namespace Dicionario
             }
         }
   
-        private void AddWord(string word)
+        private void AddWord(string word, bool update = true)
         {
             this.tabelaHash.AddWord(word);
             this.AtualizarTexto();
@@ -111,8 +111,10 @@ namespace Dicionario
                     foreach(string line in lines)
                     {
                         if(!tabelaHash.exists(line))
-                            this.AddWord(line);
+                            this.AddWord(line, false);
                     }
+
+                    this.AtualizarTexto();
                 }
                 catch(Exception ex)
                 {
