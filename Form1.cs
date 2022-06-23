@@ -9,30 +9,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Dicionario.Service;
 
 namespace Dicionario
 {
     public partial class Form1 : Form
     {
+        TabelaHash tabelaHash = new TabelaHash();
+
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void Change_visible(Label toBeChanged) //ATUALIZA A VISIBILIDADE DA LABEL
+
+        private void Change_visible(Label toBeChanged, bool visible) //ATUALIZA A VISIBILIDADE DA LABEL
         {
-            if (toBeChanged.Visible == false)
-            {
-                toBeChanged.Visible = true;
-                toBeChanged.Refresh();
-                return;
-            }
-            if (toBeChanged.Visible == true)
-            {
-                toBeChanged.Visible = false;
-                toBeChanged.Refresh();
-                return;
-            }
+            toBeChanged.Visible = visible;
+            toBeChanged.Refresh();
+            return;
         }
 
         private void LabelInserirPalavra(object sender, EventArgs e)
@@ -42,24 +37,58 @@ namespace Dicionario
 
         public void InserirPalavra(object sender, EventArgs e)
         {
-            Debug.WriteLine("Voce clicou em inserir palavra");
-            string gravarPalavra = textBox1.ToString();
-            MessageBox.Show(gravarPalavra);
+            string palavra = textBox1.Text;
 
-            //Label 1 - PALAVRA ADICIONADA COM SUCESSO
-            // LABEL 2 - PALAVRA JA EXISTE NO DICIONARIO
-            //LABEL 3 - VALOR NULO
-            Debug.WriteLine(" - "+gravarPalavra);
-            if (string.IsNullOrWhiteSpace(textBoxName.Text))
+            if(palavra != "")
             {
-                Change_visible(label3);
+                bool exists = this.tabelaHash.exists(palavra);
+
+                if(exists)
+                {
+                    this.label1.Text = "A palavra já existe no dicionário!";
+                    this.label1.ForeColor = System.Drawing.Color.Red;
+                }
+                else
+                {
+                    string message = "Essa palavra não está no dicionário, deseja inseri-la?";
+                    string caption = "Inserir palavra";
+
+                    MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                    DialogResult result;
+
+                    result = MessageBox.Show(message, caption, buttons);
+                    if(result == DialogResult.Yes)
+                    {
+                        this.tabelaHash.AddWord(palavra);
+
+                        this.label1.Text = "Palavra inserida com sucesso!";
+                        this.label1.ForeColor = System.Drawing.Color.Green;
+                    }
+                    else if(result == DialogResult.No)
+                    {
+                        Change_visible(this.label1, false);
+                        return;
+                    }
+                }
+
+                Change_visible(this.label1, true);
             }
             else
             {
-                Change_visible(label2);
+                this.label1.Text = "Você precisa digitar uma palavra!";
+                this.label1.ForeColor = System.Drawing.Color.Red;
+
+                Change_visible(this.label1, true);
             }
+
+            this.AtualizarTexto();
         }
   
+        private void AtualizarTexto()
+        {
+            this.label2.Text = tabelaHash.ToString();
+            this.Change_visible(label2, true);
+        }
 
         private void AbrirArquivo(object sender, EventArgs e)
         {
@@ -80,6 +109,11 @@ namespace Dicionario
         public void labelSure(object sender, EventArgs e)
         {
 
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
 
         }
     }
