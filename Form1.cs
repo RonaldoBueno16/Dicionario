@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Dicionario.Service;
+using System.IO;
 
 namespace Dicionario
 {
@@ -59,7 +60,7 @@ namespace Dicionario
                     result = MessageBox.Show(message, caption, buttons);
                     if(result == DialogResult.Yes)
                     {
-                        this.tabelaHash.AddWord(palavra);
+                        this.AddWord(palavra);
 
                         this.label1.Text = "Palavra inserida com sucesso!";
                         this.label1.ForeColor = System.Drawing.Color.Green;
@@ -80,10 +81,14 @@ namespace Dicionario
 
                 Change_visible(this.label1, true);
             }
-
-            this.AtualizarTexto();
         }
   
+        private void AddWord(string word)
+        {
+            this.tabelaHash.AddWord(word);
+            this.AtualizarTexto();
+        }
+
         private void AtualizarTexto()
         {
             this.label2.Text = tabelaHash.ToString();
@@ -92,7 +97,27 @@ namespace Dicionario
 
         private void AbrirArquivo(object sender, EventArgs e)
         {
-            MessageBox.Show("Arquivo abrindo");
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Text|*.txt|All|*.*";
+            DialogResult result = ofd.ShowDialog();
+            if(result == DialogResult.OK)
+            {
+                string file = ofd.FileName;
+                Console.WriteLine(file);
+                try
+                {
+                    string[] lines = File.ReadAllLines(file);
+                    
+                    foreach(string line in lines)
+                    {
+                        this.AddWord(line);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
             
         }
 
@@ -103,7 +128,7 @@ namespace Dicionario
 
         private void button3_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Feito por Guilherme Rudio e Ronaldo Bueno");
+            MessageBox.Show("Desenvolvido por Guilherme Rudio e Ronaldo Bueno");
         }
 
         public void labelSure(object sender, EventArgs e)
